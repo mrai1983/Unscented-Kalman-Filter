@@ -32,7 +32,7 @@ public:
   MatrixXd Xsig_pred_;
 
   ///* time when the state is true, in us
-  long long time_us_;
+  long long previous_timestamp_;
 
   ///* Process noise standard deviation longitudinal acceleration in m/s^2
   double std_a_;
@@ -67,55 +67,58 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
-
-  MatrixXd x_sig_;
-
-  VectorXd x_aug_;
-
-  MatrixXd p_aug_;
-
-
-  /**
+/**
    * Constructor
    */
+
   UKF();
 
-  /**
+/**
    * Destructor
    */
+
   virtual ~UKF();
 
-  /**
+/**
    * ProcessMeasurement
    * @param meas_package The latest measurement data of either radar or laser
    */
+
   void ProcessMeasurement(MeasurementPackage meas_package);
 
-  /**
+/**
    * Prediction Predicts sigma points, the state, and the state covariance
    * matrix
    * @param delta_t Time between k and k+1 in s
    */
+
   void Prediction(double delta_t);
 
-  /**
+/**
    * Updates the state and the state covariance matrix using a laser measurement
    * @param meas_package The measurement at k+1
    */
+
   void UpdateLidar(MeasurementPackage meas_package);
 
-  /**
+/**
    * Updates the state and the state covariance matrix using a radar measurement
    * @param meas_package The measurement at k+1
    */
+
   void UpdateRadar(MeasurementPackage meas_package);
 
-
-  void GenerateSigmaPoints();
-
-  void PredictSigmaPoints(double dt);
-
-  void PredictStateAndCovariance();
+/**
+   * Init Initializes Unscented Kalman filter
+   */
+    void Init(const MeasurementPackage &measurement_pack);
+    void GenerateAugmentedSigmaPoints(MatrixXd& augmentedSigmaPoints);
+    void PredictSigmaPoints(const MatrixXd &sigmaPoints, double delta_t);
+    void PredictMeanAndCovariance();
+    void UpdateRadarMeasurement(MeasurementPackage meas_package);
+    void UpdateState(VectorXd z_pred, MatrixXd S, MatrixXd Zsig, MeasurementPackage &meas_package);
+    void ProcessNIS(VectorXd &z_diff, MatrixXd &S, MeasurementPackage meas_package);
 };
 
-#endif /* UKF_H */
+#endif
+/* UKF_H */
