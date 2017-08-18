@@ -5,7 +5,8 @@
 #include "Eigen/Dense"
 #include <vector>
 #include <string>
-#include <fstream>
+
+#include "tools.h"
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -67,6 +68,8 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  Tools tools_;
+
 /**
    * Constructor
    */
@@ -116,8 +119,8 @@ public:
     void PredictSigmaPoints(const MatrixXd &sigmaPoints, double delta_t);
     void PredictMeanAndCovariance();
     void UpdateRadarMeasurement(MeasurementPackage meas_package);
-    void UpdateState(VectorXd z_pred, MatrixXd S, MatrixXd Zsig, MeasurementPackage &meas_package);
-    void ProcessNIS(VectorXd &z_diff, MatrixXd &S, MeasurementPackage meas_package);
+
+
 };
 
 #endif

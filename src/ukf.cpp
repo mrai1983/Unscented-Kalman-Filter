@@ -7,18 +7,9 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 using std::vector;
 
-/**
- * Initializes Unscented Kalman filter*/
-
-
 UKF::UKF()
 {
   is_initialized_ = false;
-  // if this is false, laser measurements will be ignored (except during init)
-  use_laser_ = true;
-
-  // if this is false, radar measurements will be ignored (except during init)
-  use_radar_ = true;
 
   // initial state vector
   x_ = VectorXd(5);
@@ -225,11 +216,13 @@ void UKF::PredictSigmaPoints(const MatrixXd &sigmaPoints, double delta_t)
 			double px_p, py_p;
 
 			//avoid division by zero
-			if (fabs(yawd) > 0.001) {
+			if (fabs(yawd) > 0.001)
+			{
 				px_p = p_x + v/yawd * ( sin (yaw + yawd*delta_t) - sin(yaw));
 				py_p = p_y + v/yawd * ( cos(yaw) - cos(yaw+yawd*delta_t) );
 			}
-			else {
+			else
+			{
 				px_p = p_x + v*delta_t*cos(yaw);
 				py_p = p_y + v*delta_t*sin(yaw);
 			}
@@ -320,7 +313,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package)
 
 	P_ = (I - K * H_) * P_;
 
-    ProcessNIS(y, S, meas_package);
+    tools_.ProcessNIS(y, S, meas_package);
 }
 
 /****************************************************************************/
@@ -337,6 +330,8 @@ void UKF::UpdateRadar(MeasurementPackage meas_package)
     MatrixXd Zsig = MatrixXd(3, 2 * n_aug_ + 1);
     UpdateRadarMeasurement(meas_package);
 }
+
+
 
 /****************************************************************************/
 //                         Update radar process functions
@@ -447,28 +442,9 @@ void UKF::UpdateRadarMeasurement(MeasurementPackage meas_package)
 
 	  P_ = P_ - K*S*K.transpose();
 
+	  tools_.ProcessNIS(z_diff, S , meas_package);
+
 }
 
-/****************************************************************************/
-//                        Calculate NIS
-/****************************************************************************/
-void UKF::ProcessNIS(VectorXd &z_diff, MatrixXd &S, MeasurementPackage meas_package)
-{
-    int ret = (z_diff.transpose() * S.inverse() * z_diff);
 
-    if(meas_package.sensor_type_ == MeasurementPackage::RADAR)
-    {
-        cout << "NIS_radar = " << ret << endl;
-        ofstream out("NisRadar.txt", ios::app);
-        out << ret << endl;
-        out.close();
-    }
-    else
-    {
-        cout << "NIS_lidar = " << ret << endl;
-        ofstream out("NisLidar.txt", ios::app);
-        out << ret << endl;
-        out.close();
-    }
-}
 

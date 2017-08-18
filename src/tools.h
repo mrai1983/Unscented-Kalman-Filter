@@ -2,6 +2,8 @@
 #define TOOLS_H_
 #include <vector>
 #include "Eigen/Dense"
+#include "measurement_package.h"
+#include <fstream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -23,6 +25,8 @@ public:
   * A helper method to calculate RMSE.
   */
   VectorXd CalculateRMSE(const vector<VectorXd> &estimations, const vector<VectorXd> &ground_truth);
+
+  void ProcessNIS(VectorXd &z_diff, MatrixXd &S, MeasurementPackage meas_package);
 
 };
 
